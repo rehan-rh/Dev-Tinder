@@ -2,17 +2,27 @@
 const express = require("express");
 //creating instance
 const app = express();
+//order of routes matter a lot...
 
-app.use("/", (req, res)=>{//request handler
-    res.send("Hiiii....")
-})
+const { adminAuth, userAuth } = require("./middlewares/auth.js")
 
-app.use("/hello", (req, res)=>{//request handler
-    res.send("Hello....")
-})
+app.use("/admin", adminAuth);
 
-app.use("/test", (req, res)=>{//request handler
-    res.send("test from the server....")
+app.get("/user", userAuth,  (req, res)=>{
+    res.send("All user data sent");
+});
+
+app.get("/admin/getAllData", (req, res)=>{
+    res.send("All data sent");
+});
+
+app.get("/admin/deleteUser", (req, res)=>{
+    res.send("Deleted a user");
+});
+
+
+app.use("/", (req, res)=>{//this function is route handler
+   // res.send("test from the server....")
 })
 
 //server is listenig the requests
