@@ -1,34 +1,42 @@
-//importing
 const express = require("express");
-//creating instance
+const connectDB = require("./cosnfig/database");
 const app = express();
-//order of routes matter a lot...
+const User = require("./models/user")
 
-const { adminAuth, userAuth } = require("./middlewares/auth.js")
+app.post("/signup", async(req, res)=>{
+    const userObj = {
+        firstName: "saniya",
+        lastName: "begum",
+        emailId: "rehan@gmail.com",
+        password: "rehan123"
 
-
-app.get("/getUserData",  (req, res)=>{
+    }
+    //creating new insance of the user model
+    const user = new User(userObj);
     try{
-    res.send("All user data sent");
+        await user.save();
+    res.send("User added successfully...");
     }
     catch(err){
-        res.status(401).send("something went wrong....");
+        res.status(400).send("Something went wrong...", arr.message);
     }
     
-});
 
-//error handling - proper way is try and catch but keep this code at the end
-// app.use("/", (err, req, res, next)=>{
-//     if(err)
-//     {
-//         res.status(500).send("something went wrong....");
-//     }
-
-// });
+    
+})
 
 
-//server is listenig the requests
-app.listen(3000, ()=>{
-    console.log("server is successfully listening....")
-});
+
+// first connect the database then start listening the server
+connectDB()
+  .then(() => {
+    console.log("Database connected successfully...");
+    app.listen(3000, () => {
+        console.log("server is successfully listening....");
+      });
+  })
+  .catch((err) => {
+    console.error("Database cannot be connected...!!");
+  });
+
 
