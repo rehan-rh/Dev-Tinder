@@ -1,23 +1,58 @@
 const express = require("express");
 const connectDB = require("./cosnfig/database");
 const User = require("./models/user");
+const { validateSignUpData } = require("./utils/validation");
+const bcrypt = require("bcrypt");
 
 const app = express();
 app.use(express.json()); // Middleware to parse JSON
 
 // Sign up a new user
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body); // Creating a new instance of the User model
   try {
+    //validation of data
+    validateSignUpData(req);
+
+    const { firstName, lastName, emailId, password } = req.body;
+
+    //encrypt the password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Creating a new instance of the User model
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordHash,
+    });
+
     await user.save();
     res.status(201).send({ message: "User added successfully." });
   } catch (err) {
-    res
-      .status(400)
-      .send({ error: "Something went wrong.", details: err.message });
+    res.status(400).send("Error : " + err.message);
   }
 });
 
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+
+    const user =await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("Invalid credentials...!");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (isPasswordValid) {
+      res.send("Login successfull");
+    } else {
+      throw new Error("Invalid credentials...!");
+    }
+  } catch (err) {
+    res.status(400).send("Error : " + err.message);
+  }
+});
 // Get user by email
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
@@ -85,10 +120,10 @@ app.patch("/user/:userId", async (req, res) => {
     );
     if (!isUpdateAllowed) {
       throw new Error("Update not allowed...");
-    };
-    if(data?.skills.length>10){
+    }
+    if (data?.skills.length > 10) {
       throw new Error("skills are too many... only 10 can do");
-    };
+    }
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
