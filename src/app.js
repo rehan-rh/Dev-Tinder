@@ -5,15 +5,28 @@ const app = express();
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
-app.use(cors({
-  origin: "http://localhost:5173",  // Allow frontend origin
-  credentials: true,  // Allow cookies and authentication headers
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],  // Explicitly allow PATCH
-  allowedHeaders: ["Content-Type", "Authorization"],  // Ensure content-type is allowed
-}));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://devtinderrh.netlify.app/", // 🔁 replace with actual Netlify URL
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS: " + origin));
+      }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json()); // Middleware to parse JSON
 app.use(cookieParser());
-
 
 const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
@@ -21,14 +34,11 @@ const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
 const projectsRouter = require("./routes/project");
 
-
-
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", projectsRouter);
-
 
 // Connect to database and start the server
 connectDB()
