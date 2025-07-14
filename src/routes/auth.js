@@ -50,7 +50,7 @@ authRouter.post("/login", async (req, res) => {
       //add the token to cookies and send the response back to the user....
       // from expressjs.com documentation
       res.cookie("token", token, {
-        httpOnly: true,
+        httpOnly: false,
         secure: true, // ✅ Required for HTTPS (production)
         sameSite: "None", // ✅ Required for cross-site
         expires: new Date(Date.now() + 8 * 3600000),
