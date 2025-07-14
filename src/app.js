@@ -2,12 +2,13 @@ const express = require("express");
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const app = express();
-const cors = require('cors');
-
+const cors = require("cors");
+const dotenv = require("dotenv");
+dotenv.config();
 app.use(cors({
   origin: "http://localhost:5173",  // Allow frontend origin
   credentials: true,  // Allow cookies and authentication headers
-  methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],  // Explicitly allow PATCH
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],  // Explicitly allow PATCH
   allowedHeaders: ["Content-Type", "Authorization"],  // Ensure content-type is allowed
 }));
 app.use(express.json()); // Middleware to parse JSON
@@ -18,11 +19,15 @@ const authRouter = require("./routes/auth");
 const profileRouter = require("./routes/profile");
 const requestRouter = require("./routes/request");
 const userRouter = require("./routes/user");
+const projectsRouter = require("./routes/project");
+
+
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", projectsRouter);
 
 
 // Connect to database and start the server
