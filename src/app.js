@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://devtinderrh.netlify.app/", // 🔁 replace with actual Netlify URL
+  "https://devtinderrh.netlify.app", // 🔁 replace with actual Netlify URL
 ];
 
 app.use(
