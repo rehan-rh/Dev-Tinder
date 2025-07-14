@@ -51,9 +51,9 @@ authRouter.post("/login", async (req, res) => {
       // from expressjs.com documentation
       res.cookie("token", token, {
         httpOnly: true,
-        secure: false, // ✅ false in local, true in production (HTTPS)
-        sameSite: "Lax", // ✅ 'Lax' for localhost, 'None' for different domains
-        expires: new Date(Date.now() + 8 * 3600000), // 8 hours
+        secure: true, // ✅ Required for HTTPS (production)
+        sameSite: "None", // ✅ Required for cross-site
+        expires: new Date(Date.now() + 8 * 3600000),
       });
 
       res.send(user);
@@ -67,6 +67,9 @@ authRouter.post("/login", async (req, res) => {
 
 authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
     expires: new Date(Date.now()),
   });
 
